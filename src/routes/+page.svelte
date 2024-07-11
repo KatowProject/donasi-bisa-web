@@ -1,7 +1,5 @@
 <script lang="ts">
 	export let data: any;
-
-	console.log(data);
 </script>
 
 <div class="row">
@@ -10,27 +8,54 @@
 	</div>
 
 	<div class="col-12">
-		<div class="row">
-			<!-- if data length is 0, set "Belum Ada Penggalangan Dana" -->
-			{#if data.props.galangs.length === 0}
-				<div class="col-12">
-					<p>Belum Ada Penggalangan Dana</p>
-				</div>
-			{:else}
-				<!-- if data length is not 0, loop through data -->
-				{#each data as item}
-					<div class="col-md-4">
-						<div class="card">
-							<img src={item.image} class="card-img-top" alt={item.title} />
-							<div class="card-body">
-								<h5 class="card-title">{item.title}</h5>
-								<p class="card-text">{item.description}</p>
-								<a href="/penggalangan-dana/{item.id}" class="btn btn-primary">Lihat Detail</a>
-							</div>
+		<div class="card">
+			<div class="card-body">
+				<div class="row justify-content-center align-items-center">
+					<!-- if data length is 0, set "Belum Ada Penggalangan Dana" -->
+					{#if data.props.galangs.length === 0}
+						<div class="col-12 text-center">
+							<p>Belum Ada Penggalangan Dana</p>
+
+							<a href="/create" class="btn btn-primary">
+								<i class="bi bi-plus-circle me-2"></i>
+								Buat
+							</a>
 						</div>
-					</div>
-				{/each}
-			{/if}
+					{:else}
+						<!-- if data length is not 0, loop through data -->
+						{#each data.props.galangs as item}
+							<div class="col-md-4">
+								<div class="card">
+									<!-- random image -->
+									<img src="https://picsum.photos/200/200" class="card-img-top" alt="..." />
+									<div class="card-body">
+										<h5 class="card-title">{item.nama}</h5>
+										<p class="card-text">{item.deskripsi}</p>
+									</div>
+
+									<div class="card-footer d-flex justify-content-between text-center">
+										<small class="text-muted">
+											<i class="bi bi-clock me-1"></i>
+											{item.deadline}
+										</small>
+									
+										<small class="text-muted">
+											<i class="bi bi-wallet2 me-1"></i>
+											{item.target}
+										</small>
+									
+										<small>
+											<!-- jumlah donatur -->
+											<i class="bi bi-people me-1"></i>
+											{item.totalDonatur}
+										</small>
+									</div>
+								</div>
+							</div>
+						{/each}
+					{/if}
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

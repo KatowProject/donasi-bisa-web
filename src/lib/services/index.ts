@@ -1,4 +1,5 @@
 import Web3 from "web3";
+
 const { VITE_RPC_URL, VITE_ADDRESS_DEPLOYER } = import.meta.env;
 
 export const web3 = new Web3(VITE_RPC_URL);
@@ -263,4 +264,8 @@ export const createGalang = async (adr: string, nama: string, desc: string, targ
     await contract.methods.createGalang(adr, nama, desc, target, deadline).send({ from: adr });
 
     return true;
+}
+
+export const isValidAddress = (address: string) => {
+    return web3.utils.isAddress(address);
 }
