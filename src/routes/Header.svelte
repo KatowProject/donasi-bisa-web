@@ -1,6 +1,26 @@
 <script lang="ts">
 	import Icon from '$lib/images/icon.png';
+
+	import { init as ConnectWeb3 } from '../services';
+	import {account, isWalletConnected} from '../stores/web3.store';
+	import { get } from 'svelte/store';
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+
+	let accountData = get(account);
+	let isWalletConnectedData = get(isWalletConnected);
+
+	onMount(() => {
+		ConnectWeb3().then(() => {
+			account.subscribe((value) => {
+				accountData = value;
+			});
+
+			isWalletConnected.subscribe((value) => {
+				isWalletConnectedData = value;
+			});
+		});
+	});
 </script>
 
 <header>
@@ -26,6 +46,27 @@
 							Balance
 						</a>
 					</li>
+
+					<!-- check wallet connected or not -->
+					{#if isWalletConnectedData}
+						<!-- if connect give set connected text, not route to create page -->
+						 <li class="nav-item">
+							<!-- nama -->
+							<div class="nav-link text-truncate">
+								<i class="bi bi-person me-1"></i>
+								{accountData}
+							</div>
+						</li>
+					{:else}
+						<li class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
+							<!-- ... for text -->
+							<a class="nav-link" href="/create">
+								<i class="bi bi-wallet me-1"></i>
+								Connect Wallet
+							</a>
+						</li>
+					{/if}
+						
 				</ul>
 			</div>
 		</div>

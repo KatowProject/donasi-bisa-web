@@ -1,32 +1,63 @@
 <script lang="ts">
-	import { isValidAddress, createGalang } from "$lib/services";
+	import { createGalang } from "../../services";
+
+	import { onMount } from "svelte";
+	let isConnected : boolean = false;
+	import Web3 from "web3";
 
 
+	let isValid = false;
 	let address = '';
+	let web3 : Web3;
 	let nama = '';
 	let deskripsi = '';
 	let target = 0;
 	let deadline = '';
 
-	function createGalangDana() {
+	async function createGalangDana() {
 		// convert target to gwei
         const targetGwei = target * 10 ** 9;
         const ded = new Date(deadline).getTime() / 1000;
 
-        const create = createGalang(address, nama, deskripsi, targetGwei, ded);
+        const create = await createGalang(nama, deskripsi, targetGwei, ded);
         console.log(create);
 	}
 
-    let isValid = true;
-    function validateAddress(event: any) {
-        const value = event.target.value;
+	async function init() {
+		 web3 = new Web3(window.ethereum);
+		const acc = await web3.eth.getAccounts()
+		
+		if(acc.length ==0) {
+			isConnected = false;
+			try {
+				await web3.eth.requestAccounts()
+				console.log("a");
+				
+				isConnected = true;
+				const acc = await web3.eth.getAccounts()
+				address = acc[0]
 
-        if (isValidAddress(value)) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-    }
+				isValid = true;
+				
+			}catch(e : any) {
+				console.log("b");
+				
+				console.log(e);
+				
+			}
+		} else {
+
+			isConnected = true;
+			address = acc[0]
+
+			isValid = true;
+		}			
+		
+	}
+	onMount(() => {
+		init();
+	
+	});
 </script>
 
 <div class="row">
@@ -44,7 +75,6 @@
 							<div class="mb-3">
 								<label for="address" class="form-label">Address</label>
 								<input
-                                    on:input={validateAddress}
 									type="text"
                                     class="form-control"
 									class:is-invalid={address && !isValid}
@@ -52,6 +82,7 @@
 									bind:value={address}
 									id="address"
 									placeholder="Alamat Penggalangan Dana"
+									readonly
 								/>
 								{#if address && !isValid}
 									<div class="invalid-feedback">Alamat tidak valid</div>

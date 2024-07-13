@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { getBalance } from '../../lib/services';
+	import { getBalance } from '../../services';
 
 	let address = '';
-	let saldo: bigint = 0n;
+	let saldo: number = 0;
 
 	async function checkSaldo() {
 		const balance = await getBalance(address);
 
-		// convert wei to ether
-		saldo = BigInt(balance) / BigInt(10 ** 18);
+		saldo = Number(balance);
 	}
 </script>
 

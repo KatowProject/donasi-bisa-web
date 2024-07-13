@@ -1,5 +1,16 @@
 <script lang="ts">
-	export let data: any;
+	import { getGalangData, type GalangData } from '../services';
+	import { onMount } from 'svelte';
+	
+	let data = [] as GalangData[];
+
+	onMount(async () => {
+		const response = await getGalangData();
+	
+		data = response;
+	});
+
+	console.log(data);
 </script>
 
 <div class="row">
@@ -12,7 +23,7 @@
 			<div class="card-body">
 				<div class="row justify-content-center align-items-center">
 					<!-- if data length is 0, set "Belum Ada Penggalangan Dana" -->
-					{#if data.props.galangs.length === 0}
+					{#if data.length === 0}
 						<div class="col-12 text-center">
 							<p>Belum Ada Penggalangan Dana</p>
 
@@ -23,7 +34,7 @@
 						</div>
 					{:else}
 						<!-- if data length is not 0, loop through data -->
-						{#each data.props.galangs as item}
+						{#each data as item}
 							<div class="col-md-4">
 								<div class="card">
 									<!-- random image -->
