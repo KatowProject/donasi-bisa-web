@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { createGalang } from "../../services";
+	import { createGalang } from '../../services';
 
-	import { onMount } from "svelte";
-	let isConnected : boolean = false;
-	import Web3 from "web3";
-
+	import { onMount } from 'svelte';
+	let isConnected: boolean = false;
+	import Web3 from 'web3';
 
 	let isValid = false;
 	let address = '';
-	let web3 : Web3;
+	let web3: Web3;
 	let nama = '';
 	let deskripsi = '';
 	let target = 0;
@@ -16,47 +15,40 @@
 
 	async function createGalangDana() {
 		// convert target to gwei
-        const targetGwei = target * 10 ** 9;
-        const ded = new Date(deadline).getTime() / 1000;
+		const targetGwei = target * 10 ** 9;
+		const ded = new Date(deadline).getTime() / 1000;
 
-        const create = await createGalang(nama, deskripsi, targetGwei, ded);
-        console.log(create);
+		const create = await createGalang(nama, deskripsi, targetGwei, ded);
+		console.log(create);
 	}
 
 	async function init() {
-		 web3 = new Web3(window.ethereum);
-		const acc = await web3.eth.getAccounts()
-		
-		if(acc.length ==0) {
+		web3 = new Web3(window.ethereum);
+		const acc = await web3.eth.getAccounts();
+		if (acc.length != 0) {
 			isConnected = false;
 			try {
-				await web3.eth.requestAccounts()
-				console.log("a");
-				
+				await web3.eth.requestAccounts();	
+			
 				isConnected = true;
-				const acc = await web3.eth.getAccounts()
-				address = acc[0]
+				const acc = await web3.eth.getAccounts();
+				address = acc[0];
 
 				isValid = true;
-				
-			}catch(e : any) {
-				console.log("b");
-				
+			} catch (e: any) {
+				console.log('b');
+
 				console.log(e);
-				
 			}
 		} else {
-
 			isConnected = true;
-			address = acc[0]
+			address = acc[0];
 
 			isValid = true;
-		}			
-		
+		}
 	}
 	onMount(() => {
 		init();
-	
 	});
 </script>
 
@@ -76,9 +68,9 @@
 								<label for="address" class="form-label">Address</label>
 								<input
 									type="text"
-                                    class="form-control"
+									class="form-control"
 									class:is-invalid={address && !isValid}
-                                    class:is-valid={address && isValid}
+									class:is-valid={address && isValid}
 									bind:value={address}
 									id="address"
 									placeholder="Alamat Penggalangan Dana"
@@ -114,7 +106,7 @@
 								<label for="target" class="form-label">Target</label>
 								<input
 									type="number"
-                                    step="0.0001"
+									step="0.0001"
 									class="form-control"
 									bind:value={target}
 									id="target"
@@ -148,11 +140,11 @@
 		margin-top: 1.5rem;
 	}
 
-    .is-invalid {
-        border-color: #dc3545;
-    }
+	.is-invalid {
+		border-color: #dc3545;
+	}
 
-    .is-valid {
-        border-color: #198754;
-    }
+	.is-valid {
+		border-color: #198754;
+	}
 </style>

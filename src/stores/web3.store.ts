@@ -1,4 +1,4 @@
-import { writable, get as getStore } from "svelte/store";
+import { writable, get as getStore, type Readable } from "svelte/store";
 import Web3, { Contract, type ContractAbi } from "web3";
 
 export const web3 = writable<Web3 | null>(null);
@@ -11,12 +11,7 @@ export function set(instance: Web3, contractInstance: Contract<ContractAbi>) {
     contract.set(contractInstance);
 }
 
-export function get() {
-    // get value all store
-    return {
-        web3: getStore(web3),
-        contract: getStore(contract),
-        isWalletConnected: getStore(isWalletConnected),
-        account: getStore(account)
-    }
+export function get<T>(store: Readable<T>) {
+    // get the store value
+    return getStore(store);
 }

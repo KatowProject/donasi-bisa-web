@@ -25,6 +25,9 @@ declare global {
     }
 }
 
+const web3 = get(w);
+const contract = get(c);
+
 export async function init() {
     const abi = [
         {
@@ -266,7 +269,6 @@ export async function init() {
     ] as const;
 
     const instance = new Web3(window.ethereum);
-
     // get accounts
     const accounts = await instance.eth.getAccounts();
     if (accounts.length > 0) {
@@ -280,8 +282,11 @@ export async function init() {
     c.set(contractInstance);
 }
 
+export async function connectWallet() {
+
+}
+
 export const getBalance = async (address: string) => {
-    const web3 = get(w);
     if (!web3) return 0;
 
     const balance = await web3.eth.getBalance(address);
@@ -291,20 +296,15 @@ export const getBalance = async (address: string) => {
 
 
 export const getGalangData = async (): Promise<GalangData[]> => {
-    const contract = get(c);
     if (!contract) return [];
 
-    const data = await contract.methods.getGalangData().call() as GalangData[];
+    const data = await contract.methods.getGalangData().call();
 
-    return data;
+    return data as GalangData[];
 }
 
 export const createGalang = async (nama: string, desc: string, target: number, deadline: number) => {
-    const contract = get(c);
-    const web3 = get(w);
-
     if (!contract || !web3) throw new Error('Contract not found');
-
 
     const address = await web3.eth.getAccounts();
     try {
