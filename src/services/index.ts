@@ -314,7 +314,7 @@ export const createGalang = async (nama: string, desc: string, target: number, d
         console.log(e);
     }
 
-    await contract.methods.createGalang(nama, desc, target, deadline).send({ from: address.shift() });
+    await contract.methods.createGalang(nama, desc, target, deadline).send({ from: address[0] });
 
     return true;
 }
