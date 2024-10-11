@@ -71,6 +71,11 @@ export async function init() {
                     "type": "string"
                 },
                 {
+                    "internalType": "string",
+                    "name": "image",
+                    "type": "string"
+                },
+                {
                     "internalType": "uint256",
                     "name": "target",
                     "type": "uint256"
@@ -109,6 +114,11 @@ export async function init() {
                 {
                     "internalType": "string",
                     "name": "_desc",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_img",
                     "type": "string"
                 },
                 {
@@ -170,6 +180,37 @@ export async function init() {
             "type": "function"
         },
         {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_idGalang",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getDonatur",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "donatur",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "value",
+                            "type": "uint256"
+                        }
+                    ],
+                    "internalType": "struct Galang.IDonatur[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
             "inputs": [],
             "name": "getGalangData",
             "outputs": [
@@ -188,6 +229,11 @@ export async function init() {
                         {
                             "internalType": "string",
                             "name": "deskripsi",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "image",
                             "type": "string"
                         },
                         {
@@ -299,24 +345,47 @@ export const getGalangData = async (): Promise<GalangData[]> => {
     return data;
 }
 
-export const createGalang = async (nama: string, desc: string, target: number, deadline: number) => {
+export const createGalang = async (nama: string, desc: string, image: File, target: string, deadline: number) => {
     const contract = get(c);
     const web3 = get(w);
 
     if (!contract || !web3) throw new Error('Contract not found');
 
-
     const address = await web3.eth.getAccounts();
     try {
-
-        await contract.methods.createGalang(nama, desc, target, deadline).call();
+        await contract.methods.createGalang(nama, desc, '', target, deadline).call();
     } catch (e) {
-        console.log(e);
+        console.error(e);
+        return false;
     }
 
-    await contract.methods.createGalang(nama, desc, target, deadline).send({ from: address[0] });
+    const img = await uploadImage(image);
+    if (!img) return false;
+
+    await contract.methods.createGalang(nama, desc, img.file.path, target, deadline).send({ from: address[0] });
 
     return true;
+}
+
+export const uploadImage = async (file: File) => {
+    try {
+        const url = 'http://localhost:5000/api/upload';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        return data;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
 }
 
 // export const isValidAddress = (web3: Web3, address: string) => {
