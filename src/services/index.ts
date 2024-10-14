@@ -7,6 +7,7 @@ export interface GalangData {
     penggalang: string;
     nama: string;
     deskripsi: string;
+    image: string;
     target: number;
     terkumpul: number;
     deadline: number;
@@ -24,9 +25,6 @@ declare global {
         ethereum: any;
     }
 }
-
-const web3 = get(w);
-const contract = get(c);
 
 export async function init() {
     const abi = [
@@ -324,15 +322,27 @@ export async function init() {
 
     const contractInstance = new instance.eth.Contract(abi, VITE_ADDRESS_DEPLOYER);
 
-    w.set(instance);
+
     c.set(contractInstance);
+    w.set(instance);
 }
 
 export async function connectWallet() {
+    const web3 = get(w);
+    if (!web3) return;
 
+    try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3.eth.getAccounts();
+        account.set(accounts[0]);
+        isWalletConnected.set(true);
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 export const getBalance = async (address: string) => {
+    const web3 = get(w);
     if (!web3) return 0;
 
     const balance = await web3.eth.getBalance(address);
@@ -341,12 +351,16 @@ export const getBalance = async (address: string) => {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getGalangData = async (): Promise<GalangData[]> => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const contract = get(c);
     if (!contract) return [];
 
     const data = await contract.methods.getGalangData().call();
 
-    return data as GalangData[];
+    return data as [];
 }
 
 export const createGalang = async (nama: string, desc: string, image: File, target: string, deadline: number) => {

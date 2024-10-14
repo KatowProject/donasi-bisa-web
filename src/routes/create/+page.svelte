@@ -12,12 +12,10 @@
 	let deadline = '';
 
 	async function createGalangDana() {
-		const targetGwei = web3.utils.toWei(target.toString(), 'gwei');
+		const targetGwei = web3.utils.toWei(target.toString(), 'ether');
 		const ded = new Date(deadline).getTime() / 1000;
 
 		const img = image[0];
-
-		console.log(address, nama, deskripsi, img, targetGwei, ded);
 
         const create = await createGalang(nama, deskripsi, img, targetGwei, ded);
         if (create) {

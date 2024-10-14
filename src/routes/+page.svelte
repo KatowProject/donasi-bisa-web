@@ -1,16 +1,33 @@
 <script lang="ts">
-	import { getGalangData, type GalangData } from '../services';
+	import { getGalangData, } from '../services';
 	import { onMount } from 'svelte';
+	import Web3 from 'web3';
+
 	
-	let data = [] as GalangData[];
+	const web3 = new Web3();
+	
+	let data = [] as any;
 
 	onMount(async () => {
-		const response = await getGalangData();
-	
-		data = response;
+		await handleGalanData();
 	});
 
-	console.log(data);
+	async function handleGalanData() {
+		const galangData = await getGalangData();
+		data = galangData;
+	}
+
+	function handleTime(time: bigint) {
+		const date = new Date(Number(time) * 1000);
+
+		return date.toLocaleDateString();
+	}
+
+	function handleTarget(target: bigint) {
+		const targetEth = web3.utils.fromWei(target.toString(), 'ether');
+
+		return targetEth;
+	}
 </script>
 
 <div class="row">
@@ -38,7 +55,7 @@
 							<div class="col-md-4">
 								<div class="card">
 									<!-- random image -->
-									<img src="https://picsum.photos/200/200" class="card-img-top" alt="..." />
+									<img src="http://localhost:5000/{item.image}" class="card-img-top" alt="..." />
 									<div class="card-body">
 										<h5 class="card-title">{item.nama}</h5>
 										<p class="card-text">{item.deskripsi}</p>
@@ -47,12 +64,12 @@
 									<div class="card-footer d-flex justify-content-between text-center">
 										<small class="text-muted">
 											<i class="bi bi-clock me-1"></i>
-											{item.deadline}
+											{handleTime(item.deadline)}
 										</small>
 									
 										<small class="text-muted">
 											<i class="bi bi-wallet2 me-1"></i>
-											{item.target}
+											{handleTarget(item.target)}
 										</small>
 									
 										<small>
@@ -60,6 +77,13 @@
 											<i class="bi bi-people me-1"></i>
 											{item.totalDonatur}
 										</small>
+									</div>
+
+									<div class="card-footer d-flex justify-content-between">
+										<a href="/detail/{item.id}" class="btn btn-primary w-100">
+											<i class="bi bi-eye me-2"></i>
+											Detail
+										</a>
 									</div>
 								</div>
 							</div>

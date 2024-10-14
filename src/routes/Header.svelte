@@ -3,24 +3,27 @@
 
 	import { init as ConnectWeb3, connectWallet} from '../services';
 	import {account, isWalletConnected} from '../stores/web3.store';
-	import { get } from 'svelte/store';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
-	let accountData = get(account);
-	let isWalletConnectedData = get(isWalletConnected);
+	let accountData = '';
+	let isWalletConnectedData = false;
 
-	onMount(() => {
-		ConnectWeb3().then(() => {
-			account.subscribe((value) => {
-				accountData = value;
-			});
-
-			isWalletConnected.subscribe((value) => {
-				isWalletConnectedData = value;
-			});
-		});
+	onMount(async () => {
+		handleInit();
 	});
+
+	async function handleInit() {
+		await ConnectWeb3();
+
+		account.subscribe((value) => {
+			accountData = value ?? '';
+		});
+
+		isWalletConnected.subscribe((value) => {
+			isWalletConnectedData = value;
+		});
+	}
 
 </script>
 
