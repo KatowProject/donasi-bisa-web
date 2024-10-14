@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/images/icon.png';
 
-	import { init as ConnectWeb3 } from '../services';
+	import { init as ConnectWeb3, connectWallet} from '../services';
 	import {account, isWalletConnected} from '../stores/web3.store';
 	import { get } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -21,6 +21,7 @@
 			});
 		});
 	});
+
 </script>
 
 <header>
@@ -58,13 +59,13 @@
 							</div>
 						</li>
 					{:else}
-						<li class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
+						<b class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
 							<!-- ... for text -->
-							<a class="nav-link" href="/create">
+							<button class="nav-link" on:click={connectWallet}>
 								<i class="bi bi-wallet me-1"></i>
 								Connect Wallet
-							</a>
-						</li>
+							</button>
+						</b>
 					{/if}
 						
 				</ul>
