@@ -4,13 +4,14 @@ import { get } from 'svelte/store';
 const { VITE_ADDRESS_DEPLOYER } = import.meta.env;
 
 export interface GalangData {
+    id: bigint;
     penggalang: string;
     nama: string;
     deskripsi: string;
     image: string;
-    target: number;
-    terkumpul: number;
-    deadline: number;
+    target: bigint;
+    terkumpul: bigint;
+    deadline: bigint;
     totalDonatur: number;
     status: number;
 }
@@ -360,7 +361,18 @@ export const getGalangData = async (): Promise<GalangData[]> => {
 
     const data = await contract.methods.getGalangData().call();
 
-    return data as [];
+    return data as GalangData[];
+}
+
+export const getGalangByIndex = async (index: number): Promise<GalangData> => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const contract = get(c);
+    if (!contract) throw new Error('Contract not found');
+
+    const data = await contract.methods.GalangData(index).call();
+
+    return data as unknown as GalangData;
 }
 
 export const createGalang = async (nama: string, desc: string, image: File, target: string, deadline: number) => {

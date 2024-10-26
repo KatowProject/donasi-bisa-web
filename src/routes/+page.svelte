@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { getGalangData, } from '../services';
+	import { getGalangData, type GalangData } from '../services';
 	import { onMount } from 'svelte';
 	import Web3 from 'web3';
 
 	
 	const web3 = new Web3();
 	
-	let data = [] as any;
+	let data = [] as GalangData[];
 
 	onMount(async () => {
-		await handleGalanData();
+		await handleGalangData();
 	});
 
-	async function handleGalanData() {
+	async function handleGalangData() {
 		const galangData = await getGalangData();
 		data = galangData;
 	}
@@ -51,7 +51,7 @@
 						</div>
 					{:else}
 						<!-- if data length is not 0, loop through data -->
-						{#each data as item}
+						{#each data as item, index}
 							<div class="col-md-4">
 								<div class="card">
 									<!-- random image -->
@@ -80,7 +80,7 @@
 									</div>
 
 									<div class="card-footer d-flex justify-content-between">
-										<a href="/detail/{item.id}" class="btn btn-primary w-100">
+										<a href="/galang/{index + 1}" class="btn btn-primary w-100">
 											<i class="bi bi-eye me-2"></i>
 											Detail
 										</a>

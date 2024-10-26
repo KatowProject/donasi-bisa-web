@@ -44,10 +44,10 @@
 						</a>
 					</li>
 
-					<li class="nav-item" aria-current={$page.url.pathname === 'balance' ? 'page' : undefined}>
-						<a class="nav-link" href="/balance">
-							<i class="bi bi-wallet me-1"></i>
-							Balance
+					<li class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
+						<a class="nav-link" href="/create">
+							<i class="bi bi-plus-circle me-1"></i>
+							Create
 						</a>
 					</li>
 
