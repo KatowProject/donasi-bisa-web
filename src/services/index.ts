@@ -20,6 +20,15 @@ export interface GalangDataResponse {
     data: GalangData[];
 }
 
+export interface GalangDataDetail extends GalangData {
+    donaturs: Donaturs[];
+}
+
+export interface Donaturs {
+    donatur: string;
+    value: bigint;
+}
+
 declare global {
     interface Window {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -351,8 +360,6 @@ export const getBalance = async (address: string) => {
     return web3.utils.fromWei(balance, 'ether');
 }
 
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getGalangData = async (): Promise<GalangData[]> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -364,15 +371,19 @@ export const getGalangData = async (): Promise<GalangData[]> => {
     return data as GalangData[];
 }
 
-export const getGalangByIndex = async (index: number): Promise<GalangData> => {
+export const getGalangByIndex = async (index: number): Promise<GalangDataDetail | null> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const contract = get(c);
     if (!contract) throw new Error('Contract not found');
 
-    const data = await contract.methods.GalangData(index).call();
+    const data = await contract.methods.GalangData(index).call() as GalangData;
+    if (!data) return null;
 
-    return data as unknown as GalangData;
+    const donaturs = await contract.methods.getDonatur(index).call() as Donaturs[];
+    if (!donaturs) return { ...data, donaturs: [] };
+
+    return { ...data, donaturs };
 }
 
 export const createGalang = async (nama: string, desc: string, image: File, target: string, deadline: number) => {
@@ -397,6 +408,30 @@ export const createGalang = async (nama: string, desc: string, image: File, targ
     return true;
 }
 
+export const donateGalang = async (id: number, value: string) => {
+    const contract = get(c);
+    const web3 = get(w);
+
+    // convert to wei
+    const valueInWei = Web3.utils.toWei(value, 'ether');
+
+    console.log(valueInWei);
+
+    if (!contract || !web3) throw new Error('Contract not found');
+
+    const address = await web3.eth.getAccounts();
+    try {
+        await contract.methods.depo(id).call({ value: valueInWei });
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+
+    await contract.methods.depo(id).send({ from: address[0], value: valueInWei });
+
+    return true;
+}
+
 export const uploadImage = async (file: File) => {
     try {
         const url = 'http://localhost:5000/api/upload';
@@ -417,7 +452,3 @@ export const uploadImage = async (file: File) => {
         return null;
     }
 }
-
-// export const isValidAddress = (web3: Web3, address: string) => {
-//     return web3.utils.isAddress(address);
-// }
