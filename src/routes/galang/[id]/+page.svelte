@@ -6,6 +6,7 @@
 	import { Circle2 } from 'svelte-loading-spinners';
 	import { donateGalang, getGalangByIndex, type GalangDataDetail } from '../../../services';
 	import Modal from '../../../components/Modal.svelte';
+	import { account } from '../../../stores/web3.store';
 
     let modalOpen = false;
 
@@ -13,6 +14,7 @@
 	let data: GalangDataDetail | null;
 	let isLoading = true;
 
+    let acc = '';
     let donateValue = 0;
 
 	onMount(async () => {
@@ -23,6 +25,10 @@
 		isLoading = true;
 		const galangData = await getGalangByIndex(id);
 		data = galangData;
+
+		account.subscribe((value) => {
+			acc = value ?? '';
+		});
 
 		isLoading = false;
 	}
@@ -35,11 +41,7 @@
 			year: 'numeric'
 		});
 	}
-
-    function handleDonate() {
-        modalOpen = true;
-    }
-
+    
     async function donate() {
         const conf = confirm(`Apakah anda yakin ingin mendonasikan ${donateValue} ETH?`);
         if (!conf) return;
@@ -140,6 +142,15 @@
                                         Donate Sekarang
                                     </button>
                                 </div>
+
+                                {#if data.penggalang === acc}
+                                    <!-- button withdraw -->
+                                    <div class="col-12 mt-3">
+                                        <button class="btn btn-danger w-100">
+                                            Withdraw
+                                        </button>
+                                    </div>
+                                {/if}
                             </div>
 						</div>
 					{/if}

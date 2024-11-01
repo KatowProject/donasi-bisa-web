@@ -30,6 +30,8 @@
 	}
 </script>
 
+<title>Donasi Bisa</title>
+
 <div class="row">
 	<div class="col-md-12 page-title">
 		<h1>List Penggalangan Dana</h1>

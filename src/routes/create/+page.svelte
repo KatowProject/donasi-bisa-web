@@ -32,6 +32,7 @@
 	});
 </script>
 
+<title>Buat Penggalangan Dana</title>
 <div class="row">
 	<div class="col-md-12 page-title">
 		<h1>Buat Galang Dana</h1>

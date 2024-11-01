@@ -44,6 +44,14 @@
 						</a>
 					</li>
 
+					<!-- your campaign -->
+					<li class="nav-item" aria-current={$page.url.pathname === 'campaign' ? 'page' : undefined}>
+						<a class="nav-link" href="/campaign">
+							<i class="bi bi-card-list me-1"></i>
+							Campaign
+						</a>
+					</li>
+
 					<li class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
 						<a class="nav-link" href="/create">
 							<i class="bi bi-plus-circle me-1"></i>
