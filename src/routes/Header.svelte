@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/images/icon.png';
 
-	import { init as ConnectWeb3, connectWallet} from '../services';
-	import {account, isWalletConnected} from '../stores/web3.store';
+	import {account, isWalletConnected, connectWallet, initWeb3, selectPlatform, logout} from '../stores/web3.store';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
@@ -14,17 +13,34 @@
 	});
 
 	async function handleInit() {
-		await ConnectWeb3();
+		await initWeb3();
 
-		account.subscribe((value) => {
-			accountData = value ?? '';
-		});
+		const savedAccount = sessionStorage.getItem('account');
+		const walletConnected = sessionStorage.getItem('walletConnected');
 
-		isWalletConnected.subscribe((value) => {
-			isWalletConnectedData = value;
-		});
+		if (walletConnected && savedAccount) {
+            account.set(savedAccount);
+            isWalletConnected.set(true);
+        }
+
+        account.subscribe((value) => {
+            accountData = value ?? '';
+        });
+
+        isWalletConnected.subscribe((value) => {
+            isWalletConnectedData = value;
+        });
 	}
 
+	async function handleConnectWallet() {
+		selectPlatform();
+
+		await connectWallet();
+	}
+
+	async function handleLogout() {
+		logout();
+	}
 </script>
 
 <header>
@@ -69,10 +85,16 @@
 								{accountData}
 							</div>
 						</li>
+						<li class="nav-item">
+                            <button class="btn btn-danger" on:click={handleLogout}>
+                                <i class="bi bi-box-arrow-right me-1"></i>
+                                Logout
+                            </button>
+                        </li>
 					{:else}
 						<b class="nav-item" aria-current={$page.url.pathname === 'create' ? 'page' : undefined}>
 							<!-- ... for text -->
-							<button class="nav-link" on:click={connectWallet}>
+							<button class="nav-link" on:click={handleConnectWallet}>
 								<i class="bi bi-wallet me-1"></i>
 								Connect Wallet
 							</button>
@@ -89,6 +111,11 @@
 	.nav-link {
 		color: #000 !important;
 	}
+
+	.nav-link:hover {
+		color: #495353 !important;
+	}
+
 	.navbar-brand span {
 		font-weight: 700;
 		/* gradient text */

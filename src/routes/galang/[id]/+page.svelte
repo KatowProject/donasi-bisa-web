@@ -4,14 +4,14 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { Circle2 } from 'svelte-loading-spinners';
-	import { donateGalang, getGalangByIndex, type GalangDataDetail } from '../../../services';
+	import { donateGalang, getGalangById } from '../../../services';
 	import Modal from '../../../components/Modal.svelte';
 	import { account } from '../../../stores/web3.store';
 
     let modalOpen = false;
 
-	let id = parseInt($page.params.id) - 1;
-	let data: GalangDataDetail | null;
+	let id = $page.params.id;
+	let data: GalangDataDetail | null = null;
 	let isLoading = true;
 
     let acc = '';
@@ -23,7 +23,7 @@
 
 	async function handleGalangData() {
 		isLoading = true;
-		const galangData = await getGalangByIndex(id);
+		const galangData = await getGalangById(id);
 		data = galangData;
 
 		account.subscribe((value) => {
@@ -55,6 +55,20 @@
         }
     }
 
+	function canWithdraw() {
+		if (!data) return false;
+
+		const targetReached = data.terkumpul >= data.target;
+		const deadlinePassed = Date.now() >= Number(data.deadline) * 1000;
+
+		return targetReached || deadlinePassed;
+    }
+
+    async function withdraw() {
+        const id = $page.params.id;
+        // await withdrawGalang(id);
+    }
+
     function handleStatus(status: string): string {
         if (status == '0') {
             return 'Belum Tercapai';
@@ -67,6 +81,8 @@
         }
     }
 </script>
+
+<title>Detail Penggalangan Dana</title>
 
 <div class="row py-3 g-2">
 	<div class="col-12">
@@ -143,14 +159,13 @@
                                     </button>
                                 </div>
 
-                                {#if data.penggalang === acc}
-                                    <!-- button withdraw -->
-                                    <div class="col-12 mt-3">
-                                        <button class="btn btn-danger w-100">
-                                            Withdraw
-                                        </button>
-                                    </div>
-                                {/if}
+								{#if data.penggalang === acc}
+									<div class="col-12 mt-3">
+										<button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw()}>
+											Withdraw
+										</button>
+									</div>
+								{/if}
                             </div>
 						</div>
 					{/if}
@@ -208,17 +223,16 @@
 </Modal>
 
 <style>
-	/* make Circle2 Center */
-	.svelte-loading-spinners {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
 	.img-card {
 		width: 100%;
 		height: auto;
 		object-fit: cover;
 		max-height: 300px; /* Adjust as needed for consistent landscape */
+	}
+
+	.svelte-loading-spinners {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 </style>
