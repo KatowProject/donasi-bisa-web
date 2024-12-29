@@ -424,12 +424,28 @@ export async function initWeb3() {
 
     const instance = new Web3(window.ethereum);
 
+    const contractInstance = new instance.eth.Contract(abi, VITE_ADDRESS_DEPLOYER);
+    contract.set(contractInstance);
+    web3.set(instance);
+
+    const pastEvents = await contractInstance.getPastEvents('allEvents', {
+        fromBlock: 0,
+        toBlock: 'latest'
+    });
+
+    pastEvents.forEach((event: any) => {
+        event.returnValues.timestamp = Math.floor(Date.now() / 1000);
+    });
+
+    transactionLogs.set(pastEvents);
+
     const platformSelected = sessionStorage.getItem('platformSelected') === 'true';
     if (platformSelected) {
         isPlatformSelected.set(true);
     }
 
     const unsubscribe = isPlatformSelected.subscribe(async (selected) => {
+        console.log(selected);
         if (selected) {
             const accounts = await instance.eth.getAccounts();
             if (accounts.length > 0) {
@@ -439,42 +455,25 @@ export async function initWeb3() {
                 sessionStorage.setItem('account', accounts[0]);
             }
 
-            const contractInstance = new instance.eth.Contract(abi, VITE_ADDRESS_DEPLOYER);
-            contract.set(contractInstance);
-            web3.set(instance);
-
             contractInstance.events.GalangCreated()
                 .on('data', (event) => {
                     transactionLogs.update(logs => [...logs, event]);
-                })
+                });
 
             contractInstance.events.Deposited()
                 .on('data', (event) => {
                     transactionLogs.update(logs => [...logs, event]);
-                })
+                });
 
             contractInstance.events.Withdrawn()
                 .on('data', (event) => {
                     transactionLogs.update(logs => [...logs, event]);
-                })
+                });
 
             contractInstance.events.FraudedGalang()
                 .on('data', (event) => {
                     transactionLogs.update(logs => [...logs, event]);
-                })
-
-            const pastEvents = await contractInstance.getPastEvents('allEvents', {
-                fromBlock: 0,
-                toBlock: 'latest'
-            });
-
-            pastEvents.forEach((event: any) => {
-                event.returnValues.timestamp = Math.floor(Date.now() / 1000);
-            });
-
-            transactionLogs.set(pastEvents);
-
-            console.log('Contract instance created');
+                });
 
             unsubscribe();
         }
@@ -507,7 +506,7 @@ export function selectPlatform() {
 export function logout() {
     account.set(null);
     isWalletConnected.set(false);
-    localStorage.removeItem('walletConnected');
-    localStorage.removeItem('account');
-    localStorage.removeItem('platformSelected');
+    sessionStorage.removeItem('walletConnected');
+    sessionStorage.removeItem('account');
+    sessionStorage.removeItem('platformSelected');
 }
