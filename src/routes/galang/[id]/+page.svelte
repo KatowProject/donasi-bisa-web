@@ -1,17 +1,15 @@
 <script lang="ts">
-	import Web3 from 'web3';
-
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { Circle2 } from 'svelte-loading-spinners';
+
 	import { donateGalang, getGalangById } from '../../../services';
-	import Modal from '../../../components/Modal.svelte';
 	import { account } from '../../../stores/web3.store';
-
-    let modalOpen = false;
-
+	
+	import DetailPenggalang from '../../../components/DetailPenggalang.svelte';
+	import ListDonatur from '../../../components/ListDonatur.svelte';
+	
 	let id = $page.params.id;
-	let data: GalangDataDetail | null = null;
+	let data: GalangDataDetail | null;
 	let isLoading = true;
 
     let acc = '';
@@ -24,6 +22,7 @@
 	async function handleGalangData() {
 		isLoading = true;
 		const galangData = await getGalangById(id);
+		
 		data = galangData;
 
 		account.subscribe((value) => {
@@ -31,15 +30,6 @@
 		});
 
 		isLoading = false;
-	}
-
-	function formatDate(dateString: string): string {
-		const date = new Date(parseInt(dateString) * 1000);
-		return date.toLocaleDateString('en-GB', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
-		});
 	}
     
     async function donate() {
@@ -55,30 +45,9 @@
         }
     }
 
-	function canWithdraw() {
-		if (!data) return false;
-
-		const targetReached = data.terkumpul >= data.target;
-		const deadlinePassed = Date.now() >= Number(data.deadline) * 1000;
-
-		return targetReached || deadlinePassed;
-    }
-
     async function withdraw() {
         const id = $page.params.id;
         // await withdrawGalang(id);
-    }
-
-    function handleStatus(status: string): string {
-        if (status == '0') {
-            return 'Belum Tercapai';
-        } else if (status == '1') {
-            return 'Tercapai';
-        } else if (status == '2') {
-            return 'Fraud';
-        } else {
-            return 'Gagal';
-        }
     }
 </script>
 
@@ -86,153 +55,17 @@
 
 <div class="row py-3 g-2">
 	<div class="col-12">
-		<div class="card">
-			<div class="card-header">
-				<h3>Detail Penggalangan Dana</h3>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					{#if isLoading}
-						<div class="svelte-loading-spinners">
-							<Circle2 />
-						</div>
-					{:else if data === null}
-						<h2>Data tidak ditemukan</h2>
-					{:else}
-						<div class="col-6">
-							<img
-								class="img-fluid img-card"
-								src="http://localhost:5000/{data.image}"
-								alt={data.nama}
-							/>
-						</div>
-
-						<div class="col-6">
-							<!-- table list -->
-							<table class="table">
-								<tbody>
-									<tr>
-										<td>Address Penggalang</td>
-										<td>{data.penggalang}</td>
-									</tr>
-									<tr>
-										<td>Nama</td>
-										<td>{data.nama}</td>
-									</tr>
-									<tr>
-										<td>Target</td>
-										<td>{Web3.utils.fromWei(data.target, 'ether')} ETH</td>
-									</tr>
-									<tr>
-										<td>Terkumpul</td>
-										<td>{Web3.utils.fromWei(data.terkumpul, 'ether')} ETH</td>
-									</tr>
-									<tr>
-										<td>Deskripsi</td>
-										<td>{data.deskripsi}</td>
-									</tr>
-									<tr>
-										<td>Deadline</td>
-										<td>{formatDate(data.deadline.toString())}</td>
-									</tr>
-                                    <tr>
-                                        <td>Status</td>
-                                        <td>
-                                            {handleStatus(data.status.toString())}
-                                        </td>
-                                    </tr>
-								</tbody>
-							</table>
-
-                            <div class="row">
-                                <div class="col-6">
-                                    <!-- input donate -->
-                                    <div class="form-group">
-                                        <input type="number" bind:value={donateValue} class="form-control" id="donate" placeholder="Masukkan jumlah donasi" />
-                                    </div>
-                                </div>
-
-                                <div class="col-6">
-                                    <!-- button donate -->
-                                    <button on:click={donate} class="btn btn-primary w-100">
-                                        Donate Sekarang
-                                    </button>
-                                </div>
-
-								{#if data.penggalang === acc}
-									<div class="col-12 mt-3">
-										<button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw()}>
-											Withdraw
-										</button>
-									</div>
-								{/if}
-                            </div>
-						</div>
-					{/if}
-				</div>
-			</div>
-		</div>
+		<DetailPenggalang 
+			isLoading={isLoading} 
+			data={data} 
+			bind:donateValue={donateValue} 
+			acc={acc} 
+			donate={donate} 
+			withdraw={withdraw}
+		/>
 	</div>
 
 	<div class="col-12">
-		<div class="card">
-			<div class="card-header">
-				<h3>Donatur</h3>
-			</div>
-			<div class="card-body">
-				{#if isLoading}
-					<div class="svelte-loading-spinners">
-						<Circle2 />
-					</div>
-				{:else if !data || data?.donaturs.length === 0}
-					<h5 class="text-center">Belum ada donatur</h5>
-				{:else}
-					<table class="table">
-						<thead>
-							<tr>
-								<th>No</th>
-								<th>Address Donatur</th>
-								<th>Jumlah Donasi</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each data.donaturs as donatur, index}
-								<tr>
-									<td>{index + 1}</td>
-									<td>{donatur.donatur}</td>
-									<td>{Web3.utils.fromWei(donatur.value, 'ether')} ETH</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				{/if}
-			</div>
-		</div>
+		<ListDonatur isLoading={isLoading} donaturs={data?.donaturs ?? []} />
 	</div>
 </div>
-
-<Modal open={modalOpen} onClosed={() => modalOpen = false}>
-    <span slot="title">Custom Modal Title</span>
-    <div slot="body">
-        <p>This is the custom body content of the modal.</p>
-    </div>
-    <div slot="footer">
-        <button type="button" class="btn btn-secondary" on:click={() => modalOpen = false}>Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-    </div>
-</Modal>
-
-<style>
-	.img-card {
-		width: 100%;
-		height: auto;
-		object-fit: cover;
-		max-height: 300px; /* Adjust as needed for consistent landscape */
-	}
-
-	.svelte-loading-spinners {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-</style>
