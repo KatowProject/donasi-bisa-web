@@ -42,9 +42,9 @@
 				<!-- <strong>Donatur:</strong> {log.returnValues.donatur} -->
                  <strong>{log.returnValues.donatur}</strong> baru saja melakukan donasi sebesar <strong>{handleTarget(log.returnValues.value)} ETH</strong>
 			{:else if log.event === 'Withdrawn'}
-				{log.returnValues.penggalang}
+				<strong>{log.returnValues.penggalang}</strong> baru saja melakukan penarikan sebesar <strong>{handleTarget(log.returnValues.value)} ETH</strong>
 			{:else if log.event === 'FraudedGalang'}
-				{log.returnValues.penggalang}
+                <strong>{log.returnValues.penggalang}</strong> melakukan penipuan pada penggalangan dana yang dibuat oleh <strong>{log.returnValues.penggalang}</strong>
 			{/if}
 		</div>
 	</div>
