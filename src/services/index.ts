@@ -77,6 +77,25 @@ export async function donateGalang(id: string, value: string) {
     return true;
 }
 
+export async function fraudGalang(id: string): Promise<boolean> {
+    const contractInstance = get(contract);
+    const web3Instance = get(web3);
+
+    if (!contractInstance || !web3Instance) throw new Error('Contract not found');
+
+    try {
+        await contractInstance.methods.FraudDonation(id).call();
+
+        const address = await web3Instance.eth.getAccounts();
+        await contractInstance.methods.FraudDonation(id).send({ from: address[0] });
+
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 export async function uploadImage(file: File) {
     try {
         const url = 'http://localhost:5000/api/upload';
