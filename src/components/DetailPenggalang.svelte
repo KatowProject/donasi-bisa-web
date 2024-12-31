@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { formatTimestamp, handleStatus, handleTarget } from "$lib/utils";
+	import { onMount } from "svelte";
+	import { isOwner } from "../stores/web3.store";
 	import Loading from "./Loading.svelte";
+
 
     export let isLoading: boolean;
     export let data: GalangData | null;
@@ -9,6 +12,8 @@
     
     export let donate;
     export let withdraw;
+
+    let owner = false;
     
 	function canWithdraw() {
 		if (!data) return false;
@@ -18,6 +23,11 @@
 
 		return targetReached || deadlinePassed;
     }
+
+    
+    onMount(async () => {
+        owner = await isOwner() ?? false;
+    });
 
 </script>
 
@@ -103,6 +113,14 @@
                             <div class="col-12 mt-3">
                                 <button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw()}>
                                     Withdraw
+                                </button>
+                            </div>
+                        {/if}
+                        {#if owner}
+                            <!-- button fraud -->
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-danger w-100">
+                                    Fraud
                                 </button>
                             </div>
                         {/if}

@@ -6,8 +6,8 @@ const { VITE_ADDRESS_DEPLOYER } = import.meta.env;
 export const web3 = writable<Web3 | null>(null);
 export const contract = writable<Contract<ContractAbi> | null>(null);
 export const isWalletConnected = writable<boolean>(false);
-export const account = writable<string | null>(null);
 export const isPlatformSelected = writable<boolean>(false);
+export const account = writable<string | null>(null);
 export const transactionLogs = writable<any[]>([]);
 
 
@@ -548,4 +548,18 @@ export function logout() {
     sessionStorage.removeItem('walletConnected');
     sessionStorage.removeItem('account');
     sessionStorage.removeItem('platformSelected');
+}
+
+export async function isOwner() {
+    // get owner from contract
+    const contractInstance = get(contract);
+    if (!contractInstance) return;
+
+    const currentAccount = get(account);
+    if (!currentAccount) return;
+
+    const addressOwner = await contractInstance.methods.owner().call() as string;
+    if (!addressOwner) return;
+
+    return addressOwner === currentAccount;
 }
