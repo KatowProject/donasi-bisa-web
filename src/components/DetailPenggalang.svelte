@@ -10,8 +10,9 @@
     export let donateValue: number;
     export let acc: string;
     
-    export let donate;
-    export let withdraw;
+    export let donate: () => void;
+    export let withdraw: () => void;
+    export let fraudDonation: () => void;
 
     let owner = false;
     
@@ -24,9 +25,13 @@
 		return targetReached || deadlinePassed;
     }
 
-    
+    function isFraud() {
+        return data?.status.toString() === "2";
+    }
+
     onMount(async () => {
-        owner = await isOwner() ?? false;
+        if (isLoading)
+            owner = await isOwner() ?? false;
     });
 
 </script>
@@ -81,7 +86,11 @@
                             <tr>
                                 <td>Status</td>
                                 <td>
-                                    {handleStatus(data.status.toString())}
+                                    {#if isFraud()}
+                                        <span class="badge bg-danger">Penipuan</span>
+                                    {:else}
+                                        {handleStatus(data.status.toString())}
+                                    {/if}
                                 </td>
                             </tr>
                         </tbody>
@@ -98,7 +107,7 @@
                         {#if acc}
                             <div class="col-6">
                                 <!-- button donate -->
-                                <button on:click={donate} class="btn btn-primary w-100">
+                                <button on:click={donate} class="btn btn-primary w-100" disabled={!donateValue || isFraud()}>
                                     Donate Sekarang
                                 </button>
                             </div>
@@ -111,7 +120,7 @@
                         {/if}
                         {#if data.penggalang === acc}
                             <div class="col-12 mt-3">
-                                <button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw()}>
+                                <button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw() || isFraud()}>
                                     Withdraw
                                 </button>
                             </div>
@@ -119,7 +128,7 @@
                         {#if owner}
                             <!-- button fraud -->
                             <div class="col-12 mt-3">
-                                <button class="btn btn-danger w-100">
+                                <button class="btn btn-danger w-100" on:click={fraudDonation} disabled={isFraud()}>
                                     Fraud
                                 </button>
                             </div>

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
-	import { donateGalang, getGalangById } from '../../../services';
+	import { donateGalang, fraudGalang, getGalangById } from '../../../services';
 	import { account } from '../../../stores/web3.store';
 	
 	import DetailPenggalang from '../../../components/DetailPenggalang.svelte';
@@ -48,6 +48,19 @@
         const id = $page.params.id;
         // await withdrawGalang(id);
     }
+
+	async function fraudDonation() {
+		const conf = confirm('Apakah kamu yakin ingin mengindentifikasi donasi ini sebagai penipuan?');
+		if (!conf) return;
+
+		const fraud = await fraudGalang(id);
+		if (fraud) {
+			alert('Donasi berhasil diidentifikasi sebagai penipuan');
+			handleGalangData();
+		} else {
+			alert('Donasi gagal diidentifikasi sebagai penipuan');
+		}
+	}
 </script>
 
 <title>Detail Penggalangan Dana</title>
@@ -61,6 +74,7 @@
 			acc={acc} 
 			donate={donate} 
 			withdraw={withdraw}
+			fraudDonation={fraudDonation}
 		/>
 	</div>
 

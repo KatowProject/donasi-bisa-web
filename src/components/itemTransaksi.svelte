@@ -44,7 +44,7 @@
 			{:else if log.event === 'Withdrawn'}
 				<strong>{log.returnValues.penggalang}</strong> baru saja melakukan penarikan sebesar <strong>{handleTarget(log.returnValues.value)} ETH</strong>
 			{:else if log.event === 'FraudedGalang'}
-                <strong>{log.returnValues.penggalang}</strong> melakukan penipuan pada penggalangan dana yang dibuat oleh <strong>{log.returnValues.penggalang}</strong>
+                <strong>Owner Contract</strong> mengindentifikasi penggalangan ini sebagai penipuan yang dibuat oleh <strong>{log.returnValues.penggalang}</strong>
 			{/if}
 		</div>
 	</div>
