@@ -20,7 +20,6 @@
 	});
 
 	async function handleGalangData() {
-		isLoading = true;
 		const galangData = await getGalangById(id);
 		
 		data = galangData;
