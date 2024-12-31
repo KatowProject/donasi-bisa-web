@@ -32,6 +32,18 @@ export async function initWeb3() {
                     "internalType": "uint256",
                     "name": "value",
                     "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "galangId",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
                 }
             ],
             "name": "Deposited",
@@ -50,6 +62,18 @@ export async function initWeb3() {
                     "indexed": false,
                     "internalType": "uint256",
                     "name": "value",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "galangId",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
                     "type": "uint256"
                 }
             ],
@@ -94,6 +118,12 @@ export async function initWeb3() {
                     "internalType": "uint256",
                     "name": "deadline",
                     "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
                 }
             ],
             "name": "GalangCreated",
@@ -112,6 +142,18 @@ export async function initWeb3() {
                     "indexed": false,
                     "internalType": "uint256",
                     "name": "value",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "galangId",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
                     "type": "uint256"
                 }
             ],
@@ -428,13 +470,11 @@ export async function initWeb3() {
     contract.set(contractInstance);
     web3.set(instance);
 
-    const pastEvents = await contractInstance.getPastEvents('allEvents', {
-        fromBlock: 0,
-        toBlock: 'latest'
-    });
+    const latestBlock = await instance.eth.getBlockNumber();
 
-    pastEvents.forEach((event: any) => {
-        event.returnValues.timestamp = Math.floor(Date.now() / 1000);
+    const pastEvents = await contractInstance.getPastEvents('allEvents', {
+        fromBlock: Number(latestBlock) > 25 ? Number(latestBlock) - 25 : 0,
+        toBlock: 'latest'
     });
 
     transactionLogs.set(pastEvents);
@@ -445,7 +485,6 @@ export async function initWeb3() {
     }
 
     const unsubscribe = isPlatformSelected.subscribe(async (selected) => {
-        console.log(selected);
         if (selected) {
             const accounts = await instance.eth.getAccounts();
             if (accounts.length > 0) {
