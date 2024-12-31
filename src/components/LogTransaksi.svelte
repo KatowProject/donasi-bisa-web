@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import ItemTransaksi from "./itemTransaksi.svelte";
     import Loading from "./Loading.svelte";
 
     export let logs: any[];
     export let loading: boolean;
+
+    if (logs.length > 0) logs.sort((a, b) => Number(b.returnValues.timestamp) - Number(a.returnValues.timestamp));
+    
 </script>
 
 <div class="card">
