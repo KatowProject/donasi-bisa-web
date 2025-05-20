@@ -47,5 +47,13 @@
                 <strong>Owner Contract</strong> mengindentifikasi penggalangan ini sebagai penipuan yang dibuat oleh <strong>{log.returnValues.penggalang}</strong>
 			{/if}
 		</div>
+
+		<div class="mt-2">
+            <i class="bi bi-link-45deg"></i>
+            <strong>Tx Hash:</strong>
+            <a href={`https://sepolia.etherscan.io/tx/${log.transactionHash}`} target="_blank" rel="noopener noreferrer">
+                {log.transactionHash}
+            </a>
+        </div>
 	</div>
 </li>

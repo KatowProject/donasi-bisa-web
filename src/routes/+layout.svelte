@@ -27,4 +27,8 @@
 		/* min-height got length width of header and footer */
 		min-height: calc(100vh - 60px - 60px);
 	}
+
+	.container {
+		max-width: 1650px;
+	}
 </style>

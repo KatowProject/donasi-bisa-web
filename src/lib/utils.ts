@@ -23,7 +23,7 @@ export function handleTarget(target: bigint) {
 
 export function handleStatus(status: string): string {
     if (status == '0') {
-        return 'Belum Tercapai';
+        return 'Berjalan';
     } else if (status == '1') {
         return 'Tercapai';
     } else if (status == '2') {

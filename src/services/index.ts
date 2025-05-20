@@ -77,6 +77,26 @@ export async function donateGalang(id: string, value: string) {
     return true;
 }
 
+export async function withdrawGalang(id: string) {
+    const contractInstance = get(contract);
+    const web3Instance = get(web3);
+
+    if (!contractInstance || !web3Instance) throw new Error('Contract not found');
+
+    const address = await web3Instance.eth.getAccounts();
+    
+    try {
+        await contractInstance.methods.withdraw(id).call({ from: address[0] });
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+
+    await contractInstance.methods.withdraw(id).send({ from: address[0] });
+
+    return true;
+}
+
 export async function fraudGalang(id: string): Promise<boolean> {
     const contractInstance = get(contract);
     const web3Instance = get(web3);
@@ -84,9 +104,9 @@ export async function fraudGalang(id: string): Promise<boolean> {
     if (!contractInstance || !web3Instance) throw new Error('Contract not found');
 
     try {
-        await contractInstance.methods.FraudDonation(id).call();
-
         const address = await web3Instance.eth.getAccounts();
+
+        await contractInstance.methods.FraudDonation(id).call({ from: address[0] });
         await contractInstance.methods.FraudDonation(id).send({ from: address[0] });
 
         return true;

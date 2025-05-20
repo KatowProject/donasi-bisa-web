@@ -555,7 +555,7 @@ export async function isOwner() {
     const contractInstance = get(contract);
     if (!contractInstance) return;
 
-    const currentAccount = get(account);
+    const currentAccount = sessionStorage.getItem('account');
     if (!currentAccount) return;
 
     const addressOwner = await contractInstance.methods.owner().call() as string;

@@ -33,7 +33,6 @@
         if (isLoading)
             owner = await isOwner() ?? false;
     });
-
 </script>
 
 <div class="card">
@@ -107,7 +106,7 @@
                         {#if acc}
                             <div class="col-6">
                                 <!-- button donate -->
-                                <button on:click={donate} class="btn btn-primary w-100" disabled={!donateValue || isFraud()}>
+                                <button on:click={donate} class="btn btn-primary w-100" disabled={!donateValue || isFraud() || data.status.toString() === "1"}>
                                     Donate Sekarang
                                 </button>
                             </div>
@@ -120,7 +119,7 @@
                         {/if}
                         {#if data.penggalang === acc}
                             <div class="col-12 mt-3">
-                                <button on:click={withdraw} class="btn btn-danger w-100" disabled={!canWithdraw() || isFraud()}>
+                                <button on:click={withdraw} class="btn btn-success w-100" disabled={!canWithdraw() || isFraud() || data.status.toString() === "1"}>
                                     Withdraw
                                 </button>
                             </div>
@@ -128,7 +127,7 @@
                         {#if owner}
                             <!-- button fraud -->
                             <div class="col-12 mt-3">
-                                <button class="btn btn-danger w-100" on:click={fraudDonation} disabled={isFraud()}>
+                                <button class="btn btn-danger w-100" on:click={fraudDonation} disabled={isFraud() || data.status.toString() === "2"}>
                                     Fraud
                                 </button>
                             </div>
